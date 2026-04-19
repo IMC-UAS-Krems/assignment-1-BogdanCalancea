@@ -40,32 +40,132 @@ def platform() -> StreamingPlatform:
     # Artists
     # ------------------------------------------------------------------
     pixels  = Artist("a1", "Pixels",    genre="pop")
-    platform.add_artist(pixels)
+    yeat = Artist("a2", "Yeat", genre="trap")
+    inna = Artist("a3", "Inna", genre="hiphop")
+    miles = Artist("a4", "Miles Davis", genre="jazz")
+    utopia = Artist("a5", "Utopia", genre="afrohouse")
+    
+    for a in (pixels, yeat, inna, miles, utopia):
+        platform.add_artist(a)
 
     # ------------------------------------------------------------------
     # Albums & AlbumTracks
     # ------------------------------------------------------------------
     dd = Album("alb1", "Digital Dreams", artist=pixels, release_year=2022)
+    adl = Album("alb2", "ADL", artist=yeat, release_year=2026)
+    pne = Album("alb3", "Party Never Ends", artist=inna, release_year=2015)
+    kob = Album("alb4", "Kind of Blue", artist=miles, release_year=1959)
+    rbr = Album("alb5", "RBOR", artist=utopia, release_year=2025)
+    
     t1 = AlbumTrack("t1", "Pixel Rain",      180, "pop",  pixels, track_number=1)
     t2 = AlbumTrack("t2", "Grid Horizon",    210, "pop",  pixels, track_number=2)
     t3 = AlbumTrack("t3", "Vector Fields",   195, "pop",  pixels, track_number=3)
-    for track in (t1, t2, t3):
-        dd.add_track(track)
+    
+    t4 = AlbumTrack("t4", "My Way",      210, "trap",  yeat, track_number=1)
+    t5 = AlbumTrack("t5", "My Time",      220, "trap",  yeat, track_number=2)
+    
+    t6 = AlbumTrack("t6", "In Your Eyes",      180, "hiphop",  inna, track_number=1)
+    t7 = AlbumTrack("t7", "Cola Song",      200, "hiphop",  inna, track_number=2)
+    
+    t8 = AlbumTrack("t8", "Chill",      160, "jazz",  miles, track_number=1)
+    
+    t9 = AlbumTrack("t9", "Thandaza",      180, "afrohouse",  utopia, track_number=1)
+    
+    for album, tracks in [(dd, [t1, t2, t3]), (adl, [t4, t5]), (pne, [t6, t7]), (kob, [t8]), (rbr, [t9])]:
+        for track in tracks:
+            album.add_track(track)
+            platform.add_track(track)
+            album.artist.add_track(track)
+        platform.add_album(album)
+
+    # ------------------------------------------------------------------
+    # Other Tracks
+    # ------------------------------------------------------------------
+    
+    narative = NarrativeEpisode("t10", "Poem", 800, "naration", "Someone", season=1, episode_number=1)
+    
+    interview = InterviewEpisode("t11", "Interview", 1200, "life", host="Channel 5", guest="Mr. Bean") 
+    
+    audiobook = AudiobookTrack("t12", "Our World", 1600, "trees", author="Nature", narrator="Mother Nature")  
+    
+    for track in (interview, narative, audiobook):
         platform.add_track(track)
-        pixels.add_track(track)
-    platform.add_album(dd)
-
-
     # ------------------------------------------------------------------
     # Users
     # ------------------------------------------------------------------
     alice = FreeUser("u1", "Alice",   age=30)
     bob   = PremiumUser("u2", "Bob",   age=25, subscription_start=date(2023, 1, 1))
+    
+    bogdan = PremiumUser("u3", "Bogdan",   age=20, subscription_start=date(2023, 2, 3))
+    eva = PremiumUser("u4", "Eva",   age=17, subscription_start=date(2024, 3, 4))
+    andrei = PremiumUser("u5", "Andrei",   age=67, subscription_start=date(2020, 4, 5))
+    
+    mother = FamilyAccountUser("u6", "Mom", age=35)
+    mathew = FamilyMember("u7", "Mathew", age=12, parent=mother)
+    louise = FamilyMember("u8", "Louise", age=23, parent=mother)
 
-    for user in (alice, bob):
+    for user in (alice, bob, bogdan, eva, andrei, mother, mathew, louise):
         platform.add_user(user)
 
+    # ------------------------------------------------------------------
+    # Listening Sessions
+    # ------------------------------------------------------------------
+    sessions = [
+    ListeningSession("s1", alice, t1, RECENT, 200),
+    ListeningSession("s2", alice, t3, RECENT, 160),
+    
+    ListeningSession("s3", bob, t2, RECENT, 220),
+    ListeningSession("s4", bob, t3, RECENT, 170),
+    
+    ListeningSession("s5", bogdan, t4, RECENT, 230),
+    ListeningSession("s6", bogdan, t1, OLD, 175),
+    
+    ListeningSession("s7", eva, t7, RECENT, 190),
+    ListeningSession("s8", eva, t6, OLD, 220),
+    
+    ListeningSession("s9", andrei, t5, RECENT, 240),
+    ListeningSession("s10", andrei, t8, RECENT, 300),
+    
+    ListeningSession("s11", mother, t3, RECENT, 220),
+    ListeningSession("s12", mother, t9, RECENT, 260),
+    
+    ListeningSession("s13", mathew, t1, RECENT, 210),
+    ListeningSession("s14", mathew, t4, RECENT, 270),
+    
+    ListeningSession("s15", louise, t3, OLD, 250),
+    ListeningSession("s16", louise, t2, OLD, 130),
+    ]
+    
+    for session in sessions:
+        platform.record_session(session)
 
+# ------------------------------------------------------------------
+    # Playlists
+    # ------------------------------------------------------------------
+    
+    p1 = Playlist("p1", "Bogdans Fav", bogdan)
+    for track in (t1, t2, t3):
+        p1.add_track(track)
+        
+    p2 = Playlist("p2", "Evas Fav", eva)
+    for track in (t4, t5, t6):
+        p2.add_track(track)
+    
+    cp1 = CollaborativePlaylist("cp1", "BogdanEva", andrei)
+    for usr in (bogdan, eva):
+        cp1.add_contributor(usr)
+    for track in (t1, t2, t3):
+        cp1.add_track(track)
+        
+    cp2 = CollaborativePlaylist("cp2", "MathewLouiseBogdan", mother)
+    for usr in (mathew, louise, bogdan):
+        cp2.add_contributor(usr)
+    for track in (t1, t3, t4, t8):
+        cp2.add_track(track)
+
+    for playlist in (p1, p2, cp1, cp2):
+        platform.add_playlist(playlist)
+    
     return platform
 
 
